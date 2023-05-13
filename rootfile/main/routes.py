@@ -11,6 +11,11 @@ main = Blueprint('main', __name__)
 model = torch.hub.load('ultralytics/yolov5', 'custom', 'yolov5l_food.pt')
 
 
+@main.route('/')
+def home():
+    return render_template('Home.html')
+
+
 @main.route('/predict', methods=['POST'])
 def predict():
     if 'image' not in request.files:
@@ -21,6 +26,6 @@ def predict():
     img = img.resize((640, 640))
     results = model(img)
     ingredients = results.pandas().xyxy[0].value_counts('name').index.tolist()
-    recipes = query_chatgpt(ingredients)
-    return render_template('recipes.html', recipes=recipes)
+    # recipes = query_chatgpt(ingredients)
+    return render_template('recipes.html', recipes=ingredients)
 
