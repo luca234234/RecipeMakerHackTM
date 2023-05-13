@@ -1,2 +1,3 @@
 .idea
 __pycache__/
+yolov5l_food.pt
