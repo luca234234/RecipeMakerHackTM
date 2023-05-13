@@ -1,9 +1,10 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, render_template
 import torch
 from PIL import Image
-from rootfile.main.utils import generate_prompt
-import openai
+from rootfile.main.utils import query_chatgpt
+
 import io
+
 
 main = Blueprint('main', __name__)
 
@@ -20,10 +21,6 @@ def predict():
     img = img.resize((640, 640))
     results = model(img)
     ingredients = results.pandas().xyxy[0].value_counts('name').index.tolist()
-    openai.Completion.create(
-        model="",
-        prompt=generate_prompt(ingredients),
-        temperature=0.6,
-    )
-    return jsonify(ingredients)
+    recipes = query_chatgpt(ingredients)
+    return render_template('recipes.html', recipes=recipes)
 
