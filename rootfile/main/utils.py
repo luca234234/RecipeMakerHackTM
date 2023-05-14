@@ -1,6 +1,19 @@
 import openai
 import os
+from PIL import Image
+import io
 
+
+def modify_image(file):
+    img = Image.open(io.BytesIO(file)).convert("RGB")  # convert to PIL Image and ensure it's RGB
+    width, height = img.size
+    crop_side = min(width, height)
+    offsetX = (width - crop_side) // 2
+    offsetY = (height - crop_side) // 2
+    crop_area = (offsetX, offsetY, offsetX + crop_side, offsetY + crop_side)
+    img = img.crop(crop_area)
+    img = img.resize((640, 640))
+    return img
 
 def query_chatgpt(ingredients):
     openai.api_key = os.getenv("OPENAI_API_KEY")

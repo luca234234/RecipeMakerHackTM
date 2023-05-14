@@ -1,7 +1,7 @@
-from flask import Blueprint, request, jsonify, render_template, g, make_response
+from flask import Blueprint, request, jsonify, render_template
 import torch
 from PIL import Image
-from rootfile.main.utils import query_chatgpt
+from rootfile.main.utils import query_chatgpt, modify_image
 
 
 import io
@@ -22,8 +22,7 @@ def predict():
         return jsonify({'error': 'no image'}), 400
 
     file = request.files['image'].read()  # get the image file
-    img = Image.open(io.BytesIO(file)).convert("RGB")  # convert to PIL Image and ensure it's RGB
-    img = img.resize((640, 640))
+    img = modify_image(file)
     results = model(img)
     ingredients = results.pandas().xyxy[0].value_counts('name').index.tolist()
     recipe_html = query_chatgpt(ingredients)
