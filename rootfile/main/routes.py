@@ -1,10 +1,10 @@
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, jsonify, render_template, g, make_response
 import torch
 from PIL import Image
 from rootfile.main.utils import query_chatgpt
 
-import io
 
+import io
 
 main = Blueprint('main', __name__)
 
@@ -26,6 +26,10 @@ def predict():
     img = img.resize((640, 640))
     results = model(img)
     ingredients = results.pandas().xyxy[0].value_counts('name').index.tolist()
-    # recipes = query_chatgpt(ingredients)
-    return render_template('recipes.html', recipes=ingredients)
+    recipe_html = query_chatgpt(ingredients)
+    return recipe_html
 
+
+@main.route('/recipe')
+def recipe():
+    return render_template('Recpies.html')

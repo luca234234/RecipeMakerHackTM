@@ -42,16 +42,20 @@
     canvas = document.getElementById("canvas");
     // photo = document.getElementById("photo");
     startbutton = document.getElementById("snap");
-
     navigator.mediaDevices
-      .getUserMedia({ video: true, audio: false })
-      .then((stream) => {
-        video.srcObject = stream;
-        video.play();
-      })
-      .catch((err) => {
-        console.error(`An error occurred: ${err}`);
-      });
+    .getUserMedia({
+      video: {
+        facingMode: 'environment'  // use rear camera
+      },
+      audio: false
+    })
+    .then((stream) => {
+      video.srcObject = stream;
+      video.play();
+    })
+    .catch((err) => {
+      console.error(`An error occurred: ${err}`);
+    });
 
     video.addEventListener(
       "canplay",
@@ -119,9 +123,12 @@
                 method: 'POST',
                 body: formData,
             })
-            .then(response => response.json())
-            .then(data => console.log(data))
-            .catch(error => console.error('Error:', error));
+            .then(response => response.text()) // Using text() instead of json() to get the response data as an HTML string
+.then(data => {
+    localStorage.setItem('recipe', data);
+    window.location.href = '/recipe';
+})
+.catch(error => console.error('Error:', error));
         }, 'image/png');
     } else {
         clearphoto();
